@@ -11,6 +11,7 @@ uses
   cxCalc, Firedac.Comp.Client, Data.DB, cxCheckBox, System.Classes,
   cxDropDownEdit;
 
+
 //Funcoes HOMOLOGACAO
 function Insert2_0(ATabela:TTabela):integer ;
 
@@ -56,6 +57,7 @@ procedure exibirLookupDisplay(AQueryPrincipal, AQueryLookup: TFDQuery;
 ///
 function ExecComandoSQL(AParams: String): Boolean;
 function comandoSQL(AParams: String): TResultORM;
+function comandoSQL_FormattingLookUP(SQL:String;ModelMaster:TClassTabela;ListaLookup:TList<TClassTabela>):TFDQuery ;
 
 //*********** Essa chamada foi desativada pois o insert está herdada no model _insert
 //function insertORM(ATabela: TTabela): TResultORM;
@@ -231,6 +233,31 @@ begin
 
   Result :=  resposta ;
   Dao.Commit;
+end;
+
+function comandoSQL_FormattingLookUP(SQL:String;ModelMaster:TClassTabela;ListaLookup:TList<TClassTabela>):TFDQuery ;
+var query : TFDQuery ;
+    item : TClassTabela;
+
+  condicao: TList<TConditionSQL>;
+  orderBy : TList<TOrderBySQL> ;
+
+begin
+  query := comandoSQL(SQL).qryReturn ;
+  formatarFieldsResultORM(ModelMaster,Query);
+
+  if Assigned(item) then
+    for item in ListaLookup do
+    begin
+
+        condicao := TList<TConditionSQL>.Create;
+        orderBy := TList<TOrderBySQL>.Create ;
+
+       exibirLookupDisplay(query,TFDQuery(selectORM2_0(item,condicao ,orderBy ).qryReturn),ModelMaster,item);
+    end;
+
+  Result := query ;
+
 end;
 
 function selectORM(ATabela: TObject; ACondition: TList<TConditionSQL>;
