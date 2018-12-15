@@ -18,7 +18,7 @@ uses
   FireDAC.Phys.PG,
   Data.DB,
   System.Generics.Collections, System.Classes,
-  FireDAC.Phys.IBDef, FireDAC.Phys.IBWrapper, System.UITypes,System.DateUtils;
+  FireDAC.Phys.IBDef, FireDAC.Phys.IBWrapper,System.UITypes,System.DateUtils;
 
 type
   TDaoFiredac = class(TInterfacedObject,IDaoBase)
@@ -28,26 +28,18 @@ type
 
       FDatabase  : TFDConnection ;
       FTransacao : TFDTransaction ;
-      procedure ConfigParametro(AQuery: TFDQuery; AProp: TRttiProperty; ACampo: string;  ATabela: TTabela);
 
+      procedure ConfigParametro(AQuery: TFDQuery; AProp: TRttiProperty; ACampo: string;  ATabela: TTabela);
       function  CreateQuery():TFDQuery;
       procedure DestroyQuery(AQuery:TFDquery);
       procedure FechaQuery(AQuery:TFDQuery) ;
       function  ExecutaQuery(AQuery:TFDQuery) : integer  ;
       function  OpenQuery(AQuery:TFDQuery) : integer ;
 
-
       procedure configuraFields(ATabela : TObject; AFDQuery : TFDQuery) ;
 
-
-
-
       //Firedac Recovery
-       procedure eventRecover (ASender, AInitiator: TObject;
-  AException: Exception; var AAction: TFDPhysConnectionRecoverAction);
-
-
-
+       procedure eventRecover (ASender, AInitiator: TObject; AException: Exception; var AAction: TFDPhysConnectionRecoverAction);
 
       //Designer Pattern -> Padrao Singleton
       class var FInstancia : TDaoFiredac ;
@@ -373,8 +365,12 @@ begin
        case PropRtti.PropertyType.TypeKind of
         tkInt64,tkInteger:
           oo := TIntegerField.Create(AFDQuery);
-        tkString, tkUString , tkChar:
+        tkString,tkChar,tkUString :
           oo := TStringField.Create(AFDQuery);
+
+        tkWideString : oo:= TWideStringField.Create(AFDQuery);
+
+
         tkFloat :
           begin
            if CompareText(PropRtti.PropertyType.Name, 'TDate') = 0 then
@@ -403,7 +399,7 @@ begin
           if AtribRtti is TCamposInfo then
           begin
             if (AtribRtti as TCamposInfo).getSizeField > 0 then
-             oo.Size := (AtribRtti as TCamposInfo).getSizeField ;
+               oo.Size := (AtribRtti as TCamposInfo).getSizeField ;
 
             oo.DisplayLabel := (AtribRtti as TCamposInfo).getDisplayField  ;
 
@@ -446,12 +442,12 @@ end;
 
 procedure TDaoFiredac.configuraFields2_0(ATabela: TClassTabela; AFDQuery: TFDQuery);
 var
-ctx : TRttiContext ;
-typ : TRttiType ;
-PropRtti : TRttiProperty ;
-AtribRtti : TCustomAttribute ;
-oo : TField ;
-isLookup : boolean;
+  ctx : TRttiContext ;
+  typ : TRttiType ;
+  PropRtti : TRttiProperty ;
+  AtribRtti : TCustomAttribute ;
+  oo : TField ;
+  isLookup : boolean;
 begin
   ctx := TRttiContext.Create;
   try
@@ -461,8 +457,6 @@ begin
 
     for PropRtti in typ.GetProperties do
     begin
-
-
 
      if PropRtti.Name = 'RefCount' then
      begin
@@ -530,9 +524,9 @@ begin
 
         if not isLookup then
         begin
-              oo.FieldName := PropRtti.Name;
-              oo.Name := AFDQuery.Name + oo.FieldName ;
-              oo.DataSet := AFDQuery ;
+          oo.FieldName := PropRtti.Name;
+          oo.Name := AFDQuery.Name + oo.FieldName ;
+          oo.DataSet := AFDQuery ;
         end
         else
         begin
@@ -551,6 +545,7 @@ var
   oDef: IFDStanConnectionDef;
   ini : TIniOptions ;
   oParams: TFDPhysIBConnectionDefParams; // MSSQL connection params
+  FDPhysPGDriverLink1  : TFDPhysPgDriverLink ;
 begin
   inherited Create ;
 
@@ -576,10 +571,19 @@ begin
   oParams.Database         := ini.ConexaoDatabase;
   oParams.UserName         := ini.ConexaoUser_Name;
   oParams.Password         := ini.ConexaoPassword;
-  //oParams.Port             := ini.ConexaoPorta ;
+
+  if ini.ConexaoDriverID = 'PG' then
+  begin
+    FDPhysPGDriverLink1  := TFDPhysPgDriverLink.Create(nil);
+
+    oParams.Port             := ini.ConexaoPorta ;
+
+   // FDPhysPGDriverLink1.VendorLib := 'C:\Program Files\PostgreSQL\10\bin\libpq.dll';
+  end;
+
 
 //  if ini.ConexaoDriverID = 'PG' then
-//  oParams.MetaDefSchema := 'Public' ;
+ // oParams.MetaDefSchema := 'Public' ;
 
   oDef.MarkPersistent;
 

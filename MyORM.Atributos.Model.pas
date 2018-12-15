@@ -21,8 +21,8 @@ TTabela = class(TInterfacedObject,iTabela)
        function _getID : Integer  ;virtual;abstract;
  public
     function _insert : Boolean;virtual ;
-    function _insertORM : TResultORM;virtual ;
-    function _update : Boolean ;
+    function _insertORM : TResultORM;virtual;
+    function _update : Boolean ;virtual;final ;
     function _delete : Boolean ;
 
     constructor Create();Overload;
@@ -354,11 +354,11 @@ begin
         begin
           if AtribRtti is TCamposProperty then
           begin
-
+             prop.PropertyType.TypeKind ;
              case prop.PropertyType.TypeKind of
 
                 tkInteger,tkInt64:    prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsInteger);
-                tkString, tkUString , tkChar: prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsString);
+                tkString, tkUString , tkChar {Tipos para postGreSQL},tkWideChar,tkWideString, tkAnsiString: prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsString);
                 tkFloat :
                   begin
                      if CompareText(Prop.PropertyType.Name, 'TDate') = 0 then

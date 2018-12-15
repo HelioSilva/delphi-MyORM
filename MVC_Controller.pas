@@ -12,50 +12,41 @@ TClassRecord = class
 
 end;
 
-iMyORM_Controller = interface
+TControllerMyORM = class;
 
 
-  procedure AtualizaEventos ;
 
-   //CRUD BASICO
-        function read():iMyORM_Controller ;
-        function create_update(Value:TClassRecord):iMyORM_Controller ;
-        function delete(Value:integer):iMyORM_Controller ;
-
-   //Functions of Views
-        procedure InsertView ;
-        procedure UpdateView(Value:integer);
-
-   function imprimirListagem:boolean;
-
-end;
-
-TControllerMyORM = class( TInterfacedObject, iMyORM_Controller )
-    private
+TControllerMyORM = class
+    protected
       FModelFactory : TClassTabela ;
-      FDataSource : TDataSource ;
       FEvento :  TAtualizaDataSource;
+       FDataSource : TDataSource ;
+       FDataSourceItens : TDataSource ;
+    private
+
 
         constructor Create(Evento:TAtualizaDataSource;Model:TClassTabela);
         destructor  Destroy();Override;
 
-         procedure AtualizaEventos ;
+
 
 
     public
 
+
      //CRUD BASICO
-        function read():iMyORM_Controller ; virtual; abstract;
-        function create_update(Value:TClassRecord):iMyORM_Controller ;  virtual; abstract;
-        function delete(Value:integer):iMyORM_Controller ;  virtual; abstract;
+        function read():TControllerMyORM ; virtual; abstract;
+        function create_update(Value:TClassRecord):TControllerMyORM ;  virtual; abstract;
+        function delete(Value:integer):TControllerMyORM ;  virtual; abstract;
 
     //Functions of Views
         procedure InsertView ;  virtual; abstract;
         procedure UpdateView(Value:integer);  virtual; abstract;
 
+        procedure AtualizaEventos ;
    function imprimirListagem:boolean; virtual; abstract;
 
-   class function New(EventoDatasource:TAtualizaDataSource;AModel:TClassTabela):iMyORM_Controller;
+   class function New(EventoDatasource:TAtualizaDataSource;AModel:TClassTabela):TControllerMyORM;
 
 
 end;
@@ -79,6 +70,8 @@ begin
   FEvento := Evento ;
   FModelFactory := Model ;
 
+  FDataSource := TDataSource.Create(nil);
+
 end;
 
 destructor TControllerMyORM.Destroy;
@@ -90,9 +83,9 @@ begin
 end;
 
 class function TControllerMyORM.New(EventoDatasource: TAtualizaDataSource;
-  AModel: TClassTabela): iMyORM_Controller;
+  AModel: TClassTabela): TControllerMyORM;
 begin
-  Result := self.Create(EventoDatasource,AModel) ;
+  Result :=  self.Create(EventoDatasource,AModel) ;
 end;
 
 end.
