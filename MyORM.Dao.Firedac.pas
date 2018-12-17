@@ -25,7 +25,7 @@ type
     strict private
       constructor Create(Arq : String);
     private
-
+      FSGDB_Postgresql : boolean ;
       FDatabase  : TFDConnection ;
       FTransacao : TFDTransaction ;
 
@@ -363,15 +363,20 @@ begin
      begin
 
        case PropRtti.PropertyType.TypeKind of
-        tkInt64,tkInteger:
+         tkInt64,tkInteger:
           oo := TIntegerField.Create(AFDQuery);
-        tkString,tkChar,tkUString :
-          oo := TStringField.Create(AFDQuery);
-
-        tkWideString : oo:= TWideStringField.Create(AFDQuery);
 
 
-        tkFloat :
+         tkString,tkChar,tkUString,tkWideString:
+         begin
+          if FSGDB_Postgresql then
+             oo:= TWideStringField.Create(AFDQuery)
+          else
+             oo := TStringField.Create(AFDQuery);
+
+         end;
+
+         tkFloat :
           begin
            if CompareText(PropRtti.PropertyType.Name, 'TDate') = 0 then
              oo := TDateField.Create(AFDQuery)
@@ -468,8 +473,15 @@ begin
        case PropRtti.PropertyType.TypeKind of
         tkInt64,tkInteger:
           oo := TIntegerField.Create(AFDQuery);
-        tkString, tkUString , tkChar:
-          oo := TStringField.Create(AFDQuery);
+        tkString, tkUString , tkChar,tkWideString:
+        begin
+         if FSGDB_Postgresql then
+             oo:= TWideStringField.Create(AFDQuery)
+          else
+             oo := TStringField.Create(AFDQuery);
+        end;
+
+
         tkFloat :
           begin
            if CompareText(PropRtti.PropertyType.Name, 'TDate') = 0 then
@@ -574,10 +586,9 @@ begin
 
   if ini.ConexaoDriverID = 'PG' then
   begin
+    FSGDB_Postgresql := true ;
     FDPhysPGDriverLink1  := TFDPhysPgDriverLink.Create(nil);
-
     oParams.Port             := ini.ConexaoPorta ;
-
    // FDPhysPGDriverLink1.VendorLib := 'C:\Program Files\PostgreSQL\10\bin\libpq.dll';
   end;
 
