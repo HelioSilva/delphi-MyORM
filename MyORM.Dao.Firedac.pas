@@ -320,7 +320,12 @@ begin
       tkFloat :
       begin
         if CompareText(AProp.PropertyType.Name, 'TDate') = 0 then
-         ParamByName(ACampo).AsString := FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>)
+        begin
+         if FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>) <> '30.12.1899' then
+          ParamByName(ACampo).AsString := FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>)
+         else
+          ParamByName(ACampo).AsString := ' null '
+        end
         else
         if CompareText(AProp.PropertyType.Name, 'TTime') = 0 then
          ParamByName(ACampo).AsString := FormatDateTime('hh:nn:ss',AProp.GetValue(ATabela).AsType<TDateTime>)
@@ -963,7 +968,10 @@ begin
                                   tkFloat :
                                   begin
                                     if CompareText(propRtti.PropertyType.Name, 'TDate') = 0 then
-                                     table.FieldByName(campo).AsDateTime := propRtti.GetValue(ATabela).AsType<TDateTime>
+                                    begin
+                                     if FormatDateTime('dd.mm.yyyy', propRtti.GetValue(ATabela).AsType<TDateTime>) <> '30.12.1899' then
+                                       table.FieldByName(campo).AsDateTime := propRtti.GetValue(ATabela).AsType<TDateTime>;
+                                    end
                                     else
                                     if CompareText(propRtti.PropertyType.Name, 'TTime') = 0 then
                                      table.FieldByName(campo).AsDateTime := propRtti.GetValue(ATabela).AsType<TDateTime>
