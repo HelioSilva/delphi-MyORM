@@ -324,7 +324,7 @@ begin
          if FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>) <> '30.12.1899' then
           ParamByName(ACampo).AsString := FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>)
          else
-          ParamByName(ACampo).AsString := ' null '
+          ParamByName(ACampo).Clear;
         end
         else
         if CompareText(AProp.PropertyType.Name, 'TTime') = 0 then
@@ -1096,7 +1096,7 @@ begin
                  ConfigParametro(Qry, PropRtti, Campo, ATabela);
                end;
           end;
-
+             Qry.Prepare ;
           Result := ExecutaQuery(Qry);
         end;
     finally
