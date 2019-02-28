@@ -21,6 +21,10 @@ uses
   FireDAC.Phys.IBDef, FireDAC.Phys.IBWrapper,System.UITypes,System.DateUtils;
 
 type
+  RRecordModel  = record
+
+  end;
+
   TDaoFiredac = class(TInterfacedObject,IDaoBase)
     strict private
       constructor Create(Arq : String);
@@ -48,7 +52,6 @@ type
     //------------------------------------------------------------------------------
     public
       procedure configuraFields2_0(ATabela : TClassTabela; AFDQuery : TFDQuery) ;
-
 
       procedure OnOpenMode();
       procedure OFFOpenMode();
@@ -323,6 +326,14 @@ begin
         begin
          if FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>) <> '30.12.1899' then
           ParamByName(ACampo).AsString := FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>)
+         else
+          ParamByName(ACampo).Clear;
+        end
+        else
+        if CompareText(AProp.PropertyType.Name, 'TDateTime') = 0  then
+        begin
+          if FormatDateTime('dd.mm.yyyy',AProp.GetValue(ATabela).AsType<TDateTime>) <> '30.12.1899' then
+          ParamByName(ACampo).AsString := FormatDateTime('dd.mm.yyyy H:M',AProp.GetValue(ATabela).AsType<TDateTime>)
          else
           ParamByName(ACampo).Clear;
         end
@@ -785,6 +796,7 @@ begin
   end;
 end;
 
+
 procedure TDaoFiredac.FechaQuery(AQuery : TFDQuery);
 begin
  with AQuery do
@@ -1040,6 +1052,7 @@ function TDaoFiredac.Salvar(ATabela: TTabela): TResultORM;
 var
   Comando: TFuncaoAnonima;
   Qry : TFDQuery ;
+      control : TControllerModel ;
 begin
   Comando := function(ACampos: TCamposAnoni): TValue
   var
@@ -1096,7 +1109,7 @@ begin
                  ConfigParametro(Qry, PropRtti, Campo, ATabela);
                end;
           end;
-             Qry.Prepare ;
+          Qry.Prepare ;
           Result := ExecutaQuery(Qry);
         end;
     finally

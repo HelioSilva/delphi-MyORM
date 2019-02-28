@@ -37,6 +37,7 @@ function conexao(APath: String): Boolean;
 
 
 function PuxaCamposBusca(ATabela: TTabela): TListaBuscaORM;
+function PuxaNomeTabela(ATabela:TTabela): string ;
 procedure FinalizaInstance;
 
 function getPKClass(ATTabela: TTabela): String;
@@ -54,7 +55,8 @@ procedure exibirLookupDisplay(AQueryPrincipal, AQueryLookup: TFDQuery;
 /// Retorno : quantidade de registros inseridos
 /// </para>
 /// </summary>
-///
+
+
 function ExecComandoSQL(AParams: String): Boolean;
 function comandoSQL(AParams: String): TResultORM;
 function comandoSQL_FormattingLookUP(SQL:String;ModelMaster:TClassTabela;ListaLookup:TList<TClassTabela>):TFDQuery ;
@@ -82,6 +84,12 @@ implementation
 uses
   System.Rtti, Vcl.StdCtrls, Vcl.Dialogs, System.SysUtils;
 
+
+function PuxaNomeTabela(ATabela:TTabela): string ;
+var control : TControllerModel ;
+begin
+   Result := control.PegaNomeTab(ATabela) ;
+end;
 
 procedure formatarFieldsResultORM(ATabela : TClassTabela; AFDQuery : TFDQuery) ;
 var dao : TDaoFiredac ;
@@ -592,7 +600,7 @@ begin
 
                     end;
                 end;
-              tvDate:
+             tvDate :
                 begin
                   for propComponente in ACampos.TipoRtti.GetProperties do
                     if (propComponente.Name = 'Caption') then
@@ -602,7 +610,7 @@ begin
                         if propModel.Name = AList[i].NomeProperty then
                         begin
                           case ATrafego of
-                            envia:
+                              {*}envia:
                               begin
                                 if propComponente.GetValue
                                   (AForm.FindComponent(fie.Name)).ToString <> ''
@@ -611,11 +619,14 @@ begin
                                     StrtoDate(propComponente.GetValue
                                     (AForm.FindComponent(fie.Name)).ToString));
                               end;
-                            recebe:
+                              {*}recebe:
                               begin
-                                propComponente.SetValue
-                                  (AForm.FindComponent(fie.Name),
-                                  propModel.GetValue(AObject).ToString);
+                                if propModel.GetValue(AObject).ToString <> '30/12/1899' then
+                                begin
+                                  propComponente.SetValue
+                                    (AForm.FindComponent(fie.Name),
+                                    propModel.GetValue(AObject).ToString);
+                                end;
                                 for attribModel in propModel.GetAttributes do
                                   if attribModel is TCamposProperty then
                                   begin
