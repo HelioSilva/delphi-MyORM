@@ -88,6 +88,7 @@ type
       class procedure  DestroyInstancia ;
       //------------------------------------------------------------------------
 
+
   end;
 
 implementation
@@ -1109,6 +1110,7 @@ begin
                  ConfigParametro(Qry, PropRtti, Campo, ATabela);
                end;
           end;
+
           Qry.Prepare ;
           Result := ExecutaQuery(Qry);
         end;
@@ -1117,6 +1119,7 @@ begin
     end;
 
   end;
+
   //reflection da tabela e execução da query preparada acima.
   Result := RttiAnonimoDAO(ATabela, Comando);
 end;

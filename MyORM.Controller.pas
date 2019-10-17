@@ -28,6 +28,7 @@ TControllerModel = class(TInterfacedObject,TIControllerBase)
 
     function PegaNomeTab(AObjeto : TObject) : String ;
     function PegaNomeTab2_0(AObjeto         : TClassTabela) : String ;
+
     function PegaPKs(AObjeto : TObject)     : TResultArray ;
     function PegaPKs2(AObjeto : TClassTabela) : TResultArray ;
     function PegaNotNulls(AObjeto : TObject): TResultArray ;
@@ -71,7 +72,8 @@ var
  ACampos: TCamposAnoni;
  ControllerModel : TControllerModel ;
 begin
-  ACampos.NomeTabela  := ControllerModel.PegaNomeTab(ATabela);
+
+  ACampos.NomeTabela  := ControllerModel.PegaNomeTab( ATabela );
   ACampos.PKs         := ControllerModel.PegaPKs(ATabela) ;
   ACampos.AutoInc     := ControllerModel.PegaAutoInc(ATabela);
   ACampos.NotNulos    := ControllerModel.PegaNotNulls(ATabela);

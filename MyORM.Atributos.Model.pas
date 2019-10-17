@@ -17,12 +17,12 @@ end;
 
 TTabela = class(TInterfacedObject,iTabela)
  protected
-       procedure getPopular_se(AResultORM:TResultORM);
-       function _getID : Integer  ;virtual;abstract;
+     procedure getPopular_se(AResultORM:TResultORM);
+     function _getID : Integer  ;virtual;abstract;
  public
     function _insert : Boolean;virtual ;
     function _insertORM : TResultORM;virtual;
-    function _update : Boolean ;virtual;final ;
+    function _update : Boolean ;virtual ;
     function _delete : Boolean ;
 
     constructor Create();Overload;
@@ -138,7 +138,8 @@ end;
 
 implementation
 
-uses MyORM.Dao.Firedac,MyORM.Collections;
+uses MyORM.Dao.Firedac,MyORM.Collections, Vcl.ExtCtrls, Data.DB,
+  System.Classes;
 
 { TNomeTabela }
 constructor TNomeTabela.Create(ANomeTabela: String);
@@ -300,7 +301,6 @@ begin
   FDisplayLabel := aDisplayLabel ;
   FSize := aSize ;
   FColunaIndex := aColuna ;
-
 end;
 
 { TTabela }
@@ -342,6 +342,8 @@ tip : TRttiType ;
 attri : TCustomAttribute ;
 prop : TRttiProperty ;
 AtribRtti : TCustomAttribute ;
+image : TImage ;
+stream : TStream ;
 begin
  cxt := TRttiContext.Create;
  tip := cxt.GetType(Self.ClassInfo);
@@ -357,8 +359,10 @@ begin
              prop.PropertyType.TypeKind ;
              case prop.PropertyType.TypeKind of
 
-                tkInteger,tkInt64:    prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsInteger);
-                tkString, tkUString , tkChar {Tipos para postGreSQL},tkWideChar,tkWideString, tkAnsiString: prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsString);
+                tkInteger,tkInt64:
+                     prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsInteger);
+                tkString, tkUString , tkChar {Tipos para postGreSQL},tkWideChar,tkWideString, tkAnsiString:
+                     prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsString);
                 tkFloat :
                   begin
                      if CompareText(Prop.PropertyType.Name, 'TDate') = 0 then
@@ -372,6 +376,21 @@ begin
                      else
                        prop.SetValue(self,AResultORM.qryReturn.FieldByName(prop.Name).AsFloat);
                   end;
+                tkClass :
+                  begin
+//                    image := TImage.Create(nil);
+//                    image.Picture.Assign( TGraphicField(AResultORM.qryReturn.FieldByName(prop.Name)) );
+
+
+                    stream := TMemoryStream.Create;
+                    TBlobField(AResultORM.qryReturn.FieldByName(prop.Name)).SaveToStream(stream);
+                    stream.Position := 0 ;
+
+
+
+                    prop.SetValue(self,stream);
+                  end;
+
 
               end;
 

@@ -19,6 +19,8 @@ function Insert2_0(ATabela:TTabela):integer ;
 // TRANSAÇÕES ================================
 function InTransaction: Boolean;
 function StartTransaction: Boolean;
+
+function commitORM : boolean ;
 // ===========================================
 
 // MODELS ====================================
@@ -34,6 +36,7 @@ function gerenciamentoFORM(AForm: TForm; AObject: TObject;
   AList: TObjectList<TMyLiveBind>; ATrafego: TInOut): Boolean;
 
 function conexao(APath: String): Boolean;
+
 
 
 function PuxaCamposBusca(ATabela: TTabela): TListaBuscaORM;
@@ -83,6 +86,15 @@ implementation
 
 uses
   System.Rtti, Vcl.StdCtrls, Vcl.Dialogs, System.SysUtils;
+
+
+function commitORM : boolean ;
+var dao : TDaoFiredac ;
+begin
+  dao := TDaoFiredac.getInstancia ;
+
+  dao.Commit ;
+end;
 
 
 function PuxaNomeTabela(ATabela:TTabela): string ;
@@ -330,6 +342,8 @@ var
 begin
   Dao := TDaoFiredac.getInstancia(APath)  ;
 
+
+
     if Dao.isConnection then
       result := true
     else
@@ -520,10 +534,14 @@ begin
                                     if (attribModel as TCamposInfo)
                                       .getSizeField > 0 then
                                     begin
-                                      TcxCalcEdit(AForm.FindComponent(fie.Name))
-                                        .Properties.MaxLength :=
-                                        (attribModel as TCamposInfo)
-                                        .getSizeField;
+//                                     showmessage(TCamposInfo(attribModel)
+//                                        .getSizeField.ToString);
+//                                     showmessage((AForm.FindComponent(fie.Name) as TcxCalcEdit)
+//                                        .Properties.MaxLength.ToString);
+//                                      TcxCalcEdit(AForm.FindComponent(fie.Name))
+//                                        .Properties.MaxLength :=
+//                                        TCamposInfo(attribModel)
+//                                        .getSizeField;
                                     end;
 
                                   end;
@@ -650,7 +668,7 @@ begin
             end;
           end;
         end;
-        
+
     end;
 
   IniciaRtti(AForm, comando);
