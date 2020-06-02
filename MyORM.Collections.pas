@@ -21,6 +21,7 @@ function InTransaction: Boolean;
 function StartTransaction: Boolean;
 
 function commitORM : boolean ;
+function roolbackORM : boolean ;
 // ===========================================
 
 // MODELS ====================================
@@ -86,6 +87,15 @@ implementation
 
 uses
   System.Rtti, Vcl.StdCtrls, Vcl.Dialogs, System.SysUtils;
+
+
+function roolbackORM : boolean ;
+var dao : TDaoFiredac ;
+begin
+  dao := TDaoFiredac.getInstancia ;
+
+  dao.RollBack ;
+end;
 
 
 function commitORM : boolean ;
@@ -266,12 +276,12 @@ begin
   query := comandoSQL(SQL).qryReturn ;
   formatarFieldsResultORM(ModelMaster,Query);
 
-  if Assigned(item) then
+  if Assigned(ListaLookup) then
     for item in ListaLookup do
     begin
 
         condicao := TList<TConditionSQL>.Create;
-        orderBy := TList<TOrderBySQL>.Create ;
+        orderBy  := TList<TOrderBySQL>.Create ;
 
        exibirLookupDisplay(query,TFDQuery(selectORM2_0(item,condicao ,orderBy ).qryReturn),ModelMaster,item);
     end;

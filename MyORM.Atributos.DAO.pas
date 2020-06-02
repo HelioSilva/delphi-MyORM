@@ -21,6 +21,7 @@ TResultORM = record
   rowReturn : integer ;
   genReturn : integer ;
   qryReturn : TFDQuery ;
+  resp      : string ;
 end;
 
 
